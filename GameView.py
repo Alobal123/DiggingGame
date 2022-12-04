@@ -26,9 +26,9 @@ class GameView(arcade.View):
         self.level = level
 
         # Sprite lists
-        self.sprite_lists = [arcade.SpriteList() for _ in range(3)]
+        self.sprite_lists = [arcade.SpriteList(use_spatial_hash=spatial_hashing) for spatial_hashing in
+                             (False, False, True)]
         self.tile_list, self.building_list, self.worker_list = self.sprite_lists
-
         self.physics_engine = None
 
         self.camera_sprites = arcade.Camera(self.window.width, self.window.height)
@@ -44,7 +44,8 @@ class GameView(arcade.View):
                                         self.game_height,
                                         self.window)
 
-        self.dragged_over = set()
+        # Variables for controling mouse dragging behaviour
+        self.last_dragged_over = None
         self.drag_counter = 0
 
         # Move camera to base position
@@ -195,18 +196,18 @@ class GameView(arcade.View):
         tiles = arcade.get_sprites_at_point(self.get_mouse_coordinates(x, y), self.tile_list)
         for tile in tiles:
             tile.on_mouse_press()
-            self.dragged_over.add(tile)
+            self.last_dragged_over = tile
 
     def on_mouse_drag(self, x: int, y: int, dx: int, dy: int, _buttons: int, _modifiers: int):
         if self.drag_counter == 0:
             self.drag_counter = 8
             tiles = arcade.get_sprites_at_point(self.get_mouse_coordinates(x, y), self.tile_list)
             for tile in tiles:
-                if tile not in self.dragged_over:
+                if tile != self.last_dragged_over:
                     tile.on_mouse_press()
-                    self.dragged_over.add(tile)
+                    self.last_dragged_over = tile
         else:
             self.drag_counter -= 1
 
     def on_mouse_release(self, x: int, y: int, button: int, modifiers: int):
-        self.dragged_over.clear()
+        self.last_dragged_over = None
