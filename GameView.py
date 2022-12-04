@@ -18,9 +18,6 @@ class GameView(arcade.View):
     # How fast the camera pans to the player. 1.0 is instant.
     CAMERA_SPEED = 0.1
 
-    # How fast the character moves
-    PLAYER_MOVEMENT_SPEED = 7
-
     def __init__(self, window, level):
         """
         Initializer
@@ -48,6 +45,7 @@ class GameView(arcade.View):
                                         self.window)
 
         self.dragged_over = set()
+        self.drag_counter = 0
 
         # Move camera to base position
         self.camera_sprites.move_to(Vec2(-self.window.width / 2,
@@ -200,11 +198,15 @@ class GameView(arcade.View):
             self.dragged_over.add(tile)
 
     def on_mouse_drag(self, x: int, y: int, dx: int, dy: int, _buttons: int, _modifiers: int):
-        tiles = arcade.get_sprites_at_point(self.get_mouse_coordinates(x, y), self.tile_list)
-        for tile in tiles:
-            if tile not in self.dragged_over:
-                tile.on_mouse_press()
-                self.dragged_over.add(tile)
+        if self.drag_counter == 0:
+            self.drag_counter = 8
+            tiles = arcade.get_sprites_at_point(self.get_mouse_coordinates(x, y), self.tile_list)
+            for tile in tiles:
+                if tile not in self.dragged_over:
+                    tile.on_mouse_press()
+                    self.dragged_over.add(tile)
+        else:
+            self.drag_counter -= 1
 
     def on_mouse_release(self, x: int, y: int, button: int, modifiers: int):
         self.dragged_over.clear()

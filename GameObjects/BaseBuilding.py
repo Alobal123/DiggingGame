@@ -12,7 +12,7 @@ class BaseBuilding(AbstractBuilding):
         self.path = ":resources:images/tiles/doorClosed_mid.png"
         self.scale = 1.0
 
-        self.spawn_rate = self.SPAWN_RATE
+        self.spawn_rate = 0
 
         self.physics_engine = physics_engine
         self.worker_list = worker_list
