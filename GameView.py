@@ -6,7 +6,6 @@ from GameObjects.BaseBuilding import BaseBuilding
 from GameObjects.BaseTile import BaseTile
 from GameObjects.InvisibeTile import InvisibleTile
 from GameObjects.SolidTile import SolidTile
-from GameObjects.Worker import Worker
 from Physics import Physics
 
 
@@ -30,17 +29,10 @@ class GameView(arcade.View):
         self.level = level
 
         # Sprite lists
-        self.worker_list = arcade.SpriteList()
-        self.tile_list = arcade.SpriteList()
-        self.building_list = arcade.SpriteList()
+        self.sprite_lists = [arcade.SpriteList() for _ in range(3)]
+        self.tile_list, self.building_list, self.worker_list = self.sprite_lists
 
         self.physics_engine = None
-
-        # Track the current state of what key is pressed
-        self.left_pressed = False
-        self.right_pressed = False
-        self.up_pressed = False
-        self.down_pressed = False
 
         self.camera_sprites = arcade.Camera(self.window.width, self.window.height)
 
@@ -114,8 +106,12 @@ class GameView(arcade.View):
 
     def setup_buildings(self):
 
-        base = BaseBuilding(0, 0)
+        base = BaseBuilding(0, self.get_ground_height(), self.physics_engine, self.worker_list)
         self.building_list.append(base)
+
+        self.physics_engine.add_sprite_list(self.building_list,
+                                            collision_type='building',
+                                            body_type=arcade.PymunkPhysicsEngine.STATIC)
 
     def setup(self):
         """ Set up the game and initialize the variables. """
@@ -126,13 +122,6 @@ class GameView(arcade.View):
 
         width = round(self.tile_width + 1)
         height = round(self.tile_height + 1)
-
-        for i in range(3):
-            worker = Worker()
-            worker.center_x = width * - ((self.level.width + 1) / 2 + 1) + i * 10
-            worker.center_y = self.get_ground_height()
-            worker.add_to_physics_engine(self.physics_engine)
-            self.worker_list.append(worker)
 
         self.setup_tiles(width, height)
         self.setup_buildings()
@@ -161,14 +150,16 @@ class GameView(arcade.View):
                                           arcade.color.AIR_SUPERIORITY_BLUE)
 
         # Draw all the sprites.
-        self.tile_list.draw()
-        self.worker_list.draw()
-        self.building_list.draw()
+        for sprite_list in self.sprite_lists:
+            sprite_list.draw()
 
     def on_update(self, delta_time):
         """ Movement and game logic """
-        self.worker_list.update()
-        self.worker_list.update()
+        for worker in self.worker_list:
+            worker.update()
+        for building in self.building_list:
+            building.update()
+
         self.physics_engine.step()
         self.camera_mover.move()
 

@@ -12,7 +12,7 @@ class WorkerState(Enum):
 class Worker(Sprite):
     # Set up the player
     MASS = 2.0
-    MAX_HORIZONTAL_SPEED = 400
+    MAX_HORIZONTAL_SPEED = 300
     MAX_VERTICAL_SPEED = 300
     MOVE_FORCE = 4000
 
