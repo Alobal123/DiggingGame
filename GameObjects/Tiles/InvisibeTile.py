@@ -1,6 +1,4 @@
-import arcade.color
-
-from GameObjects.AbstractTile import AbstractTile
+from GameObjects.Tiles.AbstractTile import AbstractTile
 
 
 class InvisibleTile(AbstractTile):

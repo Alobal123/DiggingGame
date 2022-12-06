@@ -1,6 +1,6 @@
 from arcade import SpriteList
 
-from GameObjects.AbstractBuilding import AbstractBuilding
+from GameObjects.Buildings.AbstractBuilding import AbstractBuilding
 from GameObjects.Worker import Worker
 from Physics import Physics
 
@@ -10,7 +10,7 @@ class BaseBuilding(AbstractBuilding):
 
     def __init__(self, x, y, physics_engine: Physics, worker_list: SpriteList):
         self.path = ":resources:images/tiles/doorClosed_mid.png"
-        self.scale = 1.0
+        self.scale = 0.5
 
         self.spawn_rate = 0
 

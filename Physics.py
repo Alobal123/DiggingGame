@@ -8,12 +8,19 @@ class Physics(arcade.PymunkPhysicsEngine):
     def __init__(self):
         super().__init__(gravity=self.GRAVITY, damping=self.DAMPING)
 
-        def tile_hit_handler(player_sprite, tile_sprite, _arbiter, _space, _data):
+        def tile_hit_handler(worker_sprite, tile_sprite, _arbiter, _space, _data):
             if tile_sprite.selected:
-                player_sprite.start_digging(tile_sprite)
-            elif player_sprite.center_y - player_sprite.height / 2 <= tile_sprite.center_y:
-                player_sprite.flip_direction(tile_sprite)
+                worker_sprite.start_digging(tile_sprite)
+            elif worker_sprite.center_y - worker_sprite.height / 2 <= tile_sprite.center_y:
+                worker_sprite.flip_direction(tile_sprite)
+
+        def sign_hit_handler(worker_sprite, sign_sprite, _arbiter, _space, _data):
+            if sign_sprite.direction != worker_sprite.direction:
+                worker_sprite.flip_direction(sign_sprite)
+                return True
+            return False
 
         self.add_collision_handler('worker', 'tile', post_handler=tile_hit_handler)
         self.add_collision_handler('worker', 'worker', begin_handler=lambda *args: False)
         self.add_collision_handler('worker', 'building', begin_handler=lambda *args: False)
+        self.add_collision_handler('worker', 'sign', begin_handler=sign_hit_handler)

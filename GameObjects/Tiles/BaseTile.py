@@ -1,6 +1,6 @@
 import arcade
 
-from GameObjects.AbstractTile import AbstractTile
+from GameObjects.Tiles.AbstractTile import AbstractTile
 
 
 class BaseTile(AbstractTile):

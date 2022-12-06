@@ -2,10 +2,12 @@ import arcade
 from pyglet.math import Vec2
 
 from CameraMover import CameraMover
-from GameObjects.BaseBuilding import BaseBuilding
-from GameObjects.BaseTile import BaseTile
-from GameObjects.InvisibeTile import InvisibleTile
-from GameObjects.SolidTile import SolidTile
+from GameObjects.Buildings.BaseBuilding import BaseBuilding
+from GameObjects.Buildings.Sign import RightSign, LeftSign
+from GameObjects.Tiles.BaseTile import BaseTile
+from GameObjects.Tiles.InvisibeTile import InvisibleTile
+from GameObjects.Tiles.SolidTile import SolidTile
+
 from Physics import Physics
 
 
@@ -27,8 +29,8 @@ class GameView(arcade.View):
 
         # Sprite lists
         self.sprite_lists = [arcade.SpriteList(use_spatial_hash=spatial_hashing) for spatial_hashing in
-                             (False, False, True)]
-        self.tile_list, self.building_list, self.worker_list = self.sprite_lists
+                             (True, False, False, False)]
+        self.tile_list, self.building_list, self.sign_list, self.worker_list = self.sprite_lists
         self.physics_engine = None
 
         self.camera_sprites = arcade.Camera(self.window.width, self.window.height)
@@ -44,7 +46,7 @@ class GameView(arcade.View):
                                         self.game_height,
                                         self.window)
 
-        # Variables for controling mouse dragging behaviour
+        # Variables for controlling mouse dragging behaviour
         self.last_dragged_over = None
         self.drag_counter = 0
 
@@ -101,7 +103,7 @@ class GameView(arcade.View):
                 self.tile_list.append(tile)
 
     def get_ground_height(self):
-        return round(self.tile_height + 1) * (self.level.height / 2 + 1)
+        return round(self.tile_height + 1) * (self.level.height / 2)
 
     def setup_buildings(self):
 
@@ -110,6 +112,15 @@ class GameView(arcade.View):
 
         self.physics_engine.add_sprite_list(self.building_list,
                                             collision_type='building',
+                                            body_type=arcade.PymunkPhysicsEngine.STATIC)
+
+        right_sign = RightSign(300, self.get_ground_height())
+        left_sign = LeftSign(-300, self.get_ground_height())
+        self.sign_list.append(right_sign)
+        self.sign_list.append(left_sign)
+
+        self.physics_engine.add_sprite_list(self.sign_list,
+                                            collision_type='sign',
                                             body_type=arcade.PymunkPhysicsEngine.STATIC)
 
     def setup(self):

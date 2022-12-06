@@ -17,8 +17,8 @@ class Worker(Sprite):
     MOVE_FORCE = 4000
 
     def __init__(self):
-        super().__init__(":resources:images/animated_characters/female_person/femalePerson_idle.png",
-                         scale=0.4)
+        super().__init__(":resources:images/animated_characters/robot/robot_idle.png",
+                         scale=0.55)
         self.direction = 1
         self.engine = None
         self.bounce_source = None
@@ -57,3 +57,5 @@ class Worker(Sprite):
             if self.digging_target.hit(self.strength):
                 self.state = WorkerState.DIGGING
                 self.stop_digging()
+
+
