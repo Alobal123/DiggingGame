@@ -105,7 +105,7 @@ class GameView(arcade.View):
     def get_ground_height(self):
         return round(self.tile_height + 1) * (self.level.height / 2)
 
-    def setup_buildings(self):
+    def setup_buildings(self, width, height):
 
         base = BaseBuilding(0, self.get_ground_height(), self.physics_engine, self.worker_list)
         self.building_list.append(base)
@@ -114,8 +114,8 @@ class GameView(arcade.View):
                                             collision_type='building',
                                             body_type=arcade.PymunkPhysicsEngine.STATIC)
 
-        right_sign = RightSign(300, self.get_ground_height())
-        left_sign = LeftSign(-300, self.get_ground_height())
+        left_sign = LeftSign(width * ((self.level.width + 5) / 2) - 10, self.get_ground_height())
+        right_sign = RightSign(width * - ((self.level.width + 3) / 2 + 1) + 10, self.get_ground_height())
         self.sign_list.append(right_sign)
         self.sign_list.append(left_sign)
 
@@ -134,7 +134,7 @@ class GameView(arcade.View):
         height = round(self.tile_height + 1)
 
         self.setup_tiles(width, height)
-        self.setup_buildings()
+        self.setup_buildings(width, height)
 
         self.physics_engine.add_sprite_list(self.tile_list,
                                             friction=0.4,
