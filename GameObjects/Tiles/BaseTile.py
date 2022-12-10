@@ -6,8 +6,8 @@ from GameObjects.Tiles.AbstractTile import AbstractTile
 class BaseTile(AbstractTile):
     MAX_HEALTH = 100
 
-    def __init__(self, scaling):
-        super().__init__(":resources:images/tiles/grassCenter_round.png", scaling)
+    def __init__(self, x, y, scaling):
+        super().__init__(x, y, ":resources:images/tiles/grassCenter_round.png", scaling)
         self.health = self.MAX_HEALTH
         self.selected = False
 

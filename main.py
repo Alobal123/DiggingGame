@@ -26,7 +26,7 @@ class MyGame(arcade.Window):
 def main():
     """ Main function """
     window = MyGame(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, SCREEN_TITLE)
-    level = Level(60, 60)
+    level = Level(16, 17)
     start_view = GameView(window, level)
     start_view.setup()
     window.show_view(start_view)

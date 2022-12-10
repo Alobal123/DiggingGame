@@ -3,8 +3,10 @@ from pyglet.math import Vec2
 
 from CameraMover import CameraMover
 from GameObjects.Buildings.BaseBuilding import BaseBuilding
+from GameObjects.Buildings.Builder import Builder
 from GameObjects.Buildings.Sign import RightSign, LeftSign
 from GameObjects.Tiles.BaseTile import BaseTile
+from GameObjects.Tiles.BuildingTile import BuildingTile
 from GameObjects.Tiles.InvisibeTile import InvisibleTile
 from GameObjects.Tiles.SolidTile import SolidTile
 
@@ -29,13 +31,15 @@ class GameView(arcade.View):
 
         # Sprite lists
         self.sprite_lists = [arcade.SpriteList(use_spatial_hash=spatial_hashing) for spatial_hashing in
-                             (True, False, False, False)]
-        self.tile_list, self.building_list, self.sign_list, self.worker_list = self.sprite_lists
+                             (True, True, False, False, False)]
+        self.tile_building_list, self.tile_list, self.building_list, self.sign_list, self.worker_list \
+            = self.sprite_lists
         self.physics_engine = None
+        self.builder = Builder()
 
         self.camera_sprites = arcade.Camera(self.window.width, self.window.height)
 
-        tile = BaseTile(self.SPRITE_SCALING)
+        tile = BaseTile(0, 0, self.SPRITE_SCALING)
         self.tile_width = tile.width
         self.tile_height = tile.height
         self.game_width = self.level.width * (self.tile_width + 1)
@@ -59,49 +63,59 @@ class GameView(arcade.View):
         # Create active level tiles
         for x in range(0, self.level.width):
             for y in range(0, self.level.height):
-                tile = BaseTile(self.SPRITE_SCALING)
-                tile.center_x = width * (x - ((self.level.width - 1) / 2))
-                tile.center_y = height * (y - ((self.level.height - 1) / 2))
+                tile = BaseTile(width * (x - ((self.level.width - 1) / 2)),
+                                height * (y - ((self.level.height - 1) / 2)),
+                                self.SPRITE_SCALING)
                 self.tile_list.append(tile)
 
         # Create solid side borders on the right
         for x in range(0, (self.window.width // 2 + self.window.SIDE_OFFSET) // width + 1):
             for y in range(0, self.level.height):
-                tile = SolidTile(self.SPRITE_SCALING)
-                tile.center_x = width * ((self.level.width + 1) / 2 + x)
-                tile.center_y = height * (y - ((self.level.height - 1) / 2))
+                tile = SolidTile(width * ((self.level.width + 1) / 2 + x),
+                                 height * (y - ((self.level.height - 1) / 2)),
+                                 self.SPRITE_SCALING)
+
                 self.tile_list.append(tile)
 
         # Create invisible side borders on surface on the right
         for y in range(self.level.height, self.level.height + self.window.TOP_OFFSET // height + 1):
-            tile = InvisibleTile(self.SPRITE_SCALING)
-            tile.center_x = width * ((self.level.width + 5) / 2)
-            tile.center_y = height * (y - ((self.level.height - 1) / 2))
+            tile = InvisibleTile(width * ((self.level.width + 5) / 2),
+                                 height * (y - ((self.level.height - 1) / 2)),
+                                 self.SPRITE_SCALING)
+
             self.tile_list.append(tile)
 
         # Create solid side borders on the left
         for x in range(0, (self.window.width // 2 + self.window.SIDE_OFFSET) // width + 1):
             for y in range(0, self.level.height):
-                tile = SolidTile(self.SPRITE_SCALING)
-                tile.center_x = width * - ((self.level.width - 1) / 2 + x + 1)
-                tile.center_y = height * (y - ((self.level.height - 1) / 2))
+                tile = SolidTile(width * - ((self.level.width - 1) / 2 + x + 1),
+                                 height * (y - ((self.level.height - 1) / 2)),
+                                 self.SPRITE_SCALING)
                 self.tile_list.append(tile)
 
         # Create invisible side borders on surface on the left
         for y in range(self.level.height, self.level.height + self.window.TOP_OFFSET // height + 1):
-            tile = InvisibleTile(self.SPRITE_SCALING)
-            tile.center_x = width * - ((self.level.width + 3) / 2 + 1)
-            tile.center_y = height * (y - ((self.level.height - 1) / 2))
+            tile = InvisibleTile(width * - ((self.level.width + 3) / 2 + 1),
+                                 height * (y - ((self.level.height - 1) / 2)),
+                                 self.SPRITE_SCALING)
             self.tile_list.append(tile)
 
         # Create solid bottom borders
         for x in range(-(self.window.width // 2 + self.window.SIDE_OFFSET) // width - 1,
                        self.level.width + (self.window.SIDE_OFFSET + self.window.width // 2) // width + 1):
             for y in range(0, self.window.BOTTOM_OFFSET // height + 1):
-                tile = SolidTile(self.SPRITE_SCALING)
-                tile.center_x = width * (x - ((self.level.width - 1) / 2))
-                tile.center_y = height * - ((self.level.height - 1) / 2 + y + 1)
+                tile = SolidTile(width * (x - ((self.level.width - 1) / 2)),
+                                 height * - ((self.level.height - 1) / 2 + y + 1),
+                                 self.SPRITE_SCALING)
                 self.tile_list.append(tile)
+
+        # Create top row of buildable tiles
+        for x in range(-2, self.level.width + 2):
+            y = self.level.height
+            tile = BuildingTile(width * (x - ((self.level.width - 1) / 2)),
+                                height * (y - ((self.level.height - 1) / 2)),
+                                self.SPRITE_SCALING)
+            self.tile_building_list.append(tile)
 
     def get_ground_height(self):
         return round(self.tile_height + 1) * (self.level.height / 2)
@@ -170,7 +184,10 @@ class GameView(arcade.View):
     def on_update(self, delta_time):
         """ Movement and game logic """
         for worker in self.worker_list:
-            worker.update()
+            mined_tile = worker.update()
+            if mined_tile:
+                self.tile_building_list.append(
+                    BuildingTile(mined_tile.center_x, mined_tile.center_y, self.SPRITE_SCALING))
         for building in self.building_list:
             building.update()
 
@@ -211,6 +228,15 @@ class GameView(arcade.View):
         for tile in tiles:
             tile.on_mouse_press()
             self.last_dragged_over = tile
+
+        tiles = arcade.get_sprites_at_point(self.get_mouse_coordinates(x, y), self.tile_building_list)
+        for tile in tiles:
+            building = self.builder.build(button, tile)
+            if building:
+                self.physics_engine.add_sprite(building,
+                                               collision_type="sign",
+                                               body_type=arcade.PymunkPhysicsEngine.STATIC)
+                self.sign_list.append(building)
 
     def on_mouse_drag(self, x: int, y: int, dx: int, dy: int, _buttons: int, _modifiers: int):
         if self.drag_counter == 0:

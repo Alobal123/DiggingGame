@@ -57,5 +57,6 @@ class Worker(Sprite):
             if self.digging_target.hit(self.strength):
                 self.state = WorkerState.DIGGING
                 self.stop_digging()
+                return self.digging_target
 
 

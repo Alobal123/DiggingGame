@@ -11,4 +11,4 @@ class AbstractBuilding(arcade.Sprite, ABC):
     def __init__(self, x, y):
         super().__init__(self.path, self.scale)
         self.center_x = x
-        self.center_y = y + self.height/2
+        self.center_y = y
