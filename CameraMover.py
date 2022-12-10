@@ -30,7 +30,6 @@ class CameraMover:
         self.SPEED = 4
 
     def move(self):
-
         dx = self.camera_sprite.position.x + self.SPEED * self.direction.x
         dy = self.camera_sprite.position.y + self.SPEED * self.direction.y
 

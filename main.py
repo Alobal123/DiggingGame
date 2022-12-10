@@ -11,7 +11,7 @@ SCREEN_TITLE = "Sprite Move with Scrolling Screen Example"
 
 class MyGame(arcade.Window):
     """ Main application class. """
-    TOP_OFFSET = 400
+
     BOTTOM_OFFSET = 200
     SIDE_OFFSET = 200
 
@@ -19,7 +19,8 @@ class MyGame(arcade.Window):
         """
         Initializer
         """
-        super().__init__(width, height, title, resizable=True)
+        super().__init__(width, height, title, resizable=True, fullscreen=True)
+        self.TOP_OFFSET = self.height -200
 
 
 def main():

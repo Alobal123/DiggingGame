@@ -35,6 +35,7 @@ class GameView(arcade.View):
 
         self.camera_sprites = arcade.Camera(self.window.width, self.window.height)
 
+
         tile = BaseTile(self.SPRITE_SCALING)
         self.tile_width = tile.width
         self.tile_height = tile.height
@@ -184,7 +185,6 @@ class GameView(arcade.View):
 
         MARGIN_SIZE = 70
         direction = Vec2(0, 0)
-
         if x < MARGIN_SIZE:
             direction.x = -1
         if x > self.window.width - MARGIN_SIZE:
