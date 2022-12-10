@@ -35,7 +35,6 @@ class GameView(arcade.View):
 
         self.camera_sprites = arcade.Camera(self.window.width, self.window.height)
 
-
         tile = BaseTile(self.SPRITE_SCALING)
         self.tile_width = tile.width
         self.tile_height = tile.height
@@ -66,7 +65,7 @@ class GameView(arcade.View):
                 self.tile_list.append(tile)
 
         # Create solid side borders on the right
-        for x in range(0, self.window.SIDE_OFFSET // width + 1):
+        for x in range(0, (self.window.width // 2 + self.window.SIDE_OFFSET) // width + 1):
             for y in range(0, self.level.height):
                 tile = SolidTile(self.SPRITE_SCALING)
                 tile.center_x = width * ((self.level.width + 1) / 2 + x)
@@ -81,7 +80,7 @@ class GameView(arcade.View):
             self.tile_list.append(tile)
 
         # Create solid side borders on the left
-        for x in range(0, self.window.SIDE_OFFSET // width + 1):
+        for x in range(0, (self.window.width // 2 + self.window.SIDE_OFFSET) // width + 1):
             for y in range(0, self.level.height):
                 tile = SolidTile(self.SPRITE_SCALING)
                 tile.center_x = width * - ((self.level.width - 1) / 2 + x + 1)
@@ -96,7 +95,8 @@ class GameView(arcade.View):
             self.tile_list.append(tile)
 
         # Create solid bottom borders
-        for x in range(-self.window.SIDE_OFFSET // width + 1, self.level.width + self.window.SIDE_OFFSET // width + 1):
+        for x in range(-(self.window.width // 2 + self.window.SIDE_OFFSET) // width - 1,
+                       self.level.width + (self.window.SIDE_OFFSET + self.window.width // 2) // width + 1):
             for y in range(0, self.window.BOTTOM_OFFSET // height + 1):
                 tile = SolidTile(self.SPRITE_SCALING)
                 tile.center_x = width * (x - ((self.level.width - 1) / 2))
@@ -142,6 +142,14 @@ class GameView(arcade.View):
                                             collision_type="tile",
                                             body_type=arcade.PymunkPhysicsEngine.STATIC)
 
+    def draw_sky(self):
+        # Draw sky
+        arcade.draw_lrtb_rectangle_filled(min(-self.game_width, -self.window.width // 2),
+                                          max(self.game_width, self.window.width // 2),
+                                          self.game_height // 2 + self.window.TOP_OFFSET,
+                                          self.game_height // 2 + 1,
+                                          arcade.color.AIR_SUPERIORITY_BLUE)
+
     def on_draw(self):
         """
         Render the screen.
@@ -153,12 +161,7 @@ class GameView(arcade.View):
         # Select the camera we'll use to draw all our sprites
         self.camera_sprites.use()
 
-        # Draw sky
-        arcade.draw_lrtb_rectangle_filled(-self.game_width,
-                                          self.game_width,
-                                          self.game_height // 2 + self.window.TOP_OFFSET,
-                                          self.game_height // 2 + 1,
-                                          arcade.color.AIR_SUPERIORITY_BLUE)
+        self.draw_sky()
 
         # Draw all the sprites.
         for sprite_list in self.sprite_lists:

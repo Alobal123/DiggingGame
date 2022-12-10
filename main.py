@@ -20,13 +20,13 @@ class MyGame(arcade.Window):
         Initializer
         """
         super().__init__(width, height, title, resizable=True, fullscreen=True)
-        self.TOP_OFFSET = self.height -200
+        self.TOP_OFFSET = self.height - 300
 
 
 def main():
     """ Main function """
     window = MyGame(DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HEIGHT, SCREEN_TITLE)
-    level = Level(16, 16)
+    level = Level(60, 60)
     start_view = GameView(window, level)
     start_view.setup()
     window.show_view(start_view)
