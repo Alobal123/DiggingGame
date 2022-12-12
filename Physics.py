@@ -1,5 +1,8 @@
 import arcade
 
+from GameObjects.Buildings.Sign import Sign
+from GameObjects.Worker import Worker
+
 
 class Physics(arcade.PymunkPhysicsEngine):
     GRAVITY = (0, -1 * 1500)
@@ -14,7 +17,9 @@ class Physics(arcade.PymunkPhysicsEngine):
             elif worker_sprite.center_y - worker_sprite.height / 2 <= tile_sprite.center_y:
                 worker_sprite.flip_direction(tile_sprite)
 
-        def sign_hit_handler(worker_sprite, sign_sprite, _arbiter, _space, _data):
+        def sign_hit_handler(worker_sprite: Worker, sign_sprite: Sign, _arbiter, _space, _data):
+            if worker_sprite.center_y - worker_sprite.height//2 > sign_sprite.center_y:
+                return False
             if sign_sprite.direction != worker_sprite.direction:
                 worker_sprite.flip_direction(sign_sprite)
                 return True

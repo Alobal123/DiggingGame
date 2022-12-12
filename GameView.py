@@ -7,9 +7,6 @@ from GameObjects.Buildings.Builder import Builder
 from GameObjects.Buildings.Sign import RightSign, LeftSign
 from GameObjects.Tiles.BaseTile import BaseTile
 from GameObjects.Tiles.BuildingTile import BuildingTile
-from GameObjects.Tiles.InvisibeTile import InvisibleTile
-from GameObjects.Tiles.SolidTile import SolidTile
-
 from Physics import Physics
 
 
@@ -62,7 +59,6 @@ class GameView(arcade.View):
         return round(self.tile_height + 1) * (self.level.height / 2)
 
     def setup_buildings(self, width, height):
-
         tile = arcade.get_sprites_at_point((-50, self.get_ground_height() + 10), self.tile_building_list)[0]
 
         base = BaseBuilding(tile.center_x, tile.center_y,
@@ -74,10 +70,18 @@ class GameView(arcade.View):
                                             collision_type='building',
                                             body_type=arcade.PymunkPhysicsEngine.STATIC)
 
-        left_sign = LeftSign(width * ((self.level.width + 5) / 2) - 10,
-                             self.get_ground_height() + height // 2)
-        right_sign = RightSign(width * - ((self.level.width + 3) / 2 + 1) + 10,
-                               self.get_ground_height() + height // 2)
+        tile = arcade.get_sprites_at_point((width * ((self.level.width + 5) / 2) - 10,
+                                            self.get_ground_height() + height // 2),
+                                           self.tile_building_list)[0]
+
+        left_sign = LeftSign(tile.center_x, tile.center_y)
+
+        tile = arcade.get_sprites_at_point((width * - ((self.level.width + 3) / 2 + 1) + 10,
+                                            self.get_ground_height() + height // 2),
+                                           self.tile_building_list)[0]
+
+        right_sign = RightSign(tile.center_x, tile.center_y)
+
         self.sign_list.append(right_sign)
         self.sign_list.append(left_sign)
 
@@ -151,7 +155,6 @@ class GameView(arcade.View):
         self.camera_sprites.resize(int(width), int(height))
 
     def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
-
         MARGIN_SIZE = 70
         direction = Vec2(0, 0)
         if x < MARGIN_SIZE:
@@ -172,7 +175,6 @@ class GameView(arcade.View):
         return x + self.camera_mover.get_x(), y + self.camera_mover.get_y()
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
-
         tiles = arcade.get_sprites_at_point(self.get_mouse_coordinates(x, y), self.tile_list)
         for tile in tiles:
             tile.on_mouse_press()

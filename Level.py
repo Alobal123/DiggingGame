@@ -67,7 +67,7 @@ class Level:
     def create_building_tiles(self, tile_width, tile_height, scaling):
         rt = []
         # Create top row of buildable tiles
-        for x in range(-2, self.width + 2):
+        for x in range(-3, self.width + 3):
             y = self.height
             tile = BuildingTile(tile_width * (x - ((self.width - 1) / 2)),
                                 tile_height * (y - ((self.height - 1) / 2)),
