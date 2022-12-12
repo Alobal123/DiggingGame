@@ -58,79 +58,26 @@ class GameView(arcade.View):
         self.camera_sprites.move_to(Vec2(-self.window.width / 2,
                                          self.get_ground_height() - self.window.height / 2))
 
-    def setup_tiles(self, width, height):
-
-        # Create active level tiles
-        for x in range(0, self.level.width):
-            for y in range(0, self.level.height):
-                tile = BaseTile(width * (x - ((self.level.width - 1) / 2)),
-                                height * (y - ((self.level.height - 1) / 2)),
-                                self.SPRITE_SCALING)
-                self.tile_list.append(tile)
-
-        # Create solid side borders on the right
-        for x in range(0, (self.window.width // 2 + self.window.SIDE_OFFSET) // width + 1):
-            for y in range(0, self.level.height):
-                tile = SolidTile(width * ((self.level.width + 1) / 2 + x),
-                                 height * (y - ((self.level.height - 1) / 2)),
-                                 self.SPRITE_SCALING)
-
-                self.tile_list.append(tile)
-
-        # Create invisible side borders on surface on the right
-        for y in range(self.level.height, self.level.height + self.window.TOP_OFFSET // height + 1):
-            tile = InvisibleTile(width * ((self.level.width + 5) / 2),
-                                 height * (y - ((self.level.height - 1) / 2)),
-                                 self.SPRITE_SCALING)
-
-            self.tile_list.append(tile)
-
-        # Create solid side borders on the left
-        for x in range(0, (self.window.width // 2 + self.window.SIDE_OFFSET) // width + 1):
-            for y in range(0, self.level.height):
-                tile = SolidTile(width * - ((self.level.width - 1) / 2 + x + 1),
-                                 height * (y - ((self.level.height - 1) / 2)),
-                                 self.SPRITE_SCALING)
-                self.tile_list.append(tile)
-
-        # Create invisible side borders on surface on the left
-        for y in range(self.level.height, self.level.height + self.window.TOP_OFFSET // height + 1):
-            tile = InvisibleTile(width * - ((self.level.width + 3) / 2 + 1),
-                                 height * (y - ((self.level.height - 1) / 2)),
-                                 self.SPRITE_SCALING)
-            self.tile_list.append(tile)
-
-        # Create solid bottom borders
-        for x in range(-(self.window.width // 2 + self.window.SIDE_OFFSET) // width - 1,
-                       self.level.width + (self.window.SIDE_OFFSET + self.window.width // 2) // width + 1):
-            for y in range(0, self.window.BOTTOM_OFFSET // height + 1):
-                tile = SolidTile(width * (x - ((self.level.width - 1) / 2)),
-                                 height * - ((self.level.height - 1) / 2 + y + 1),
-                                 self.SPRITE_SCALING)
-                self.tile_list.append(tile)
-
-        # Create top row of buildable tiles
-        for x in range(-2, self.level.width + 2):
-            y = self.level.height
-            tile = BuildingTile(width * (x - ((self.level.width - 1) / 2)),
-                                height * (y - ((self.level.height - 1) / 2)),
-                                self.SPRITE_SCALING)
-            self.tile_building_list.append(tile)
-
     def get_ground_height(self):
         return round(self.tile_height + 1) * (self.level.height / 2)
 
     def setup_buildings(self, width, height):
 
-        base = BaseBuilding(0, self.get_ground_height(), self.physics_engine, self.worker_list)
+        tile = arcade.get_sprites_at_point((-50, self.get_ground_height() + 10), self.tile_building_list)[0]
+
+        base = BaseBuilding(tile.center_x, tile.center_y,
+                            self.physics_engine, self.worker_list)
+
         self.building_list.append(base)
 
         self.physics_engine.add_sprite_list(self.building_list,
                                             collision_type='building',
                                             body_type=arcade.PymunkPhysicsEngine.STATIC)
 
-        left_sign = LeftSign(width * ((self.level.width + 5) / 2) - 10, self.get_ground_height())
-        right_sign = RightSign(width * - ((self.level.width + 3) / 2 + 1) + 10, self.get_ground_height())
+        left_sign = LeftSign(width * ((self.level.width + 5) / 2) - 10,
+                             self.get_ground_height() + height // 2)
+        right_sign = RightSign(width * - ((self.level.width + 3) / 2 + 1) + 10,
+                               self.get_ground_height() + height // 2)
         self.sign_list.append(right_sign)
         self.sign_list.append(left_sign)
 
@@ -148,7 +95,9 @@ class GameView(arcade.View):
         width = round(self.tile_width + 1)
         height = round(self.tile_height + 1)
 
-        self.setup_tiles(width, height)
+        self.tile_list.extend(self.level.create_tiles(width, height, self.SPRITE_SCALING))
+
+        self.tile_building_list.extend(self.level.create_building_tiles(width, height, self.SPRITE_SCALING))
         self.setup_buildings(width, height)
 
         self.physics_engine.add_sprite_list(self.tile_list,
