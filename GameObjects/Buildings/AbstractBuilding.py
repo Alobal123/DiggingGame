@@ -12,3 +12,8 @@ class AbstractBuilding(arcade.Sprite, ABC):
         super().__init__(self.path, self.scale)
         self.center_x = x
         self.center_y = y
+
+    def add_to_physics(self, physics):
+        physics.add_sprite(self,
+                           collision_type='building',
+                           body_type=arcade.PymunkPhysicsEngine.STATIC)

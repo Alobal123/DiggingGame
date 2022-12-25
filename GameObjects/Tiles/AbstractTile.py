@@ -18,7 +18,14 @@ class AbstractTile(Sprite, ABC):
     def on_mouse_drag(self):
         pass
 
-    def get_tile_in_direction(self, x, y, tile_list: SpriteList):
-        return arcade.get_sprites_at_point((self.center_x + x * self.width,
-                                            self.center_y + y * self.height),
-                                           tile_list)
+    def get_tile_in_direction(self, x, y, tile_list: SpriteList) -> Sprite:
+        tiles = arcade.get_sprites_at_point((self.center_x + x * self.width,
+                                             self.center_y + y * self.height),
+                                            tile_list)
+        return tiles[0] if tiles else None
+
+    def can_be_building_foundation(self):
+        return False
+
+    def add_to_physics(self, physics):
+        physics.add_sprite(self)

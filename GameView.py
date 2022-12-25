@@ -31,8 +31,8 @@ class GameView(arcade.View):
                              (True, True, False, False, False)]
         self.tile_building_list, self.tile_list, self.building_list, self.sign_list, self.worker_list \
             = self.sprite_lists
-        self.physics_engine = None
-        self.builder = Builder()
+        self.physics_engine = Physics()
+        self.builder = Builder(self.tile_list, self.physics_engine)
 
         self.camera_sprites = arcade.Camera(self.window.width, self.window.height)
 
@@ -64,11 +64,9 @@ class GameView(arcade.View):
         base = BaseBuilding(tile.center_x, tile.center_y,
                             self.physics_engine, self.worker_list)
 
+        self.builder.build(base, tile)
         self.building_list.append(base)
-
-        self.physics_engine.add_sprite_list(self.building_list,
-                                            collision_type='building',
-                                            body_type=arcade.PymunkPhysicsEngine.STATIC)
+        base.add_to_physics(self.physics_engine)
 
         tile = arcade.get_sprites_at_point((width * ((self.level.width + 5) / 2) - 10,
                                             self.get_ground_height() + height // 2),
@@ -94,7 +92,6 @@ class GameView(arcade.View):
 
         # Set the background color
         arcade.set_background_color(arcade.color.BLACK)
-        self.physics_engine = Physics()
 
         width = round(self.tile_width + 1)
         height = round(self.tile_height + 1)
@@ -104,10 +101,8 @@ class GameView(arcade.View):
         self.tile_building_list.extend(self.level.create_building_tiles(width, height, self.SPRITE_SCALING))
         self.setup_buildings(width, height)
 
-        self.physics_engine.add_sprite_list(self.tile_list,
-                                            friction=0.4,
-                                            collision_type="tile",
-                                            body_type=arcade.PymunkPhysicsEngine.STATIC)
+        for tile in self.tile_list:
+            tile.add_to_physics(self.physics_engine)
 
     def draw_sky(self):
         # Draw sky
@@ -182,7 +177,7 @@ class GameView(arcade.View):
 
         tiles = arcade.get_sprites_at_point(self.get_mouse_coordinates(x, y), self.tile_building_list)
         for tile in tiles:
-            building = self.builder.build(button, tile)
+            building = self.builder.click_build(button, tile)
             if building:
                 self.physics_engine.add_sprite(building,
                                                collision_type="sign",
