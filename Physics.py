@@ -29,3 +29,5 @@ class Physics(arcade.PymunkPhysicsEngine):
         self.add_collision_handler('worker', 'worker', begin_handler=lambda *args: False)
         self.add_collision_handler('worker', 'building', begin_handler=lambda *args: False)
         self.add_collision_handler('worker', 'sign', begin_handler=sign_hit_handler)
+        self.add_collision_handler('sign', 'tile', begin_handler=lambda *args: False)
+        self.add_collision_handler('building', 'tile', begin_handler=lambda *args: False)

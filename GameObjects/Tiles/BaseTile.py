@@ -34,10 +34,3 @@ class BaseTile(AbstractTile):
 
     def can_be_building_foundation(self):
         return not self.selected
-
-    def add_to_physics(self, physics):
-        physics.add_sprite(self,
-                           friction=0.4,
-                           collision_type="tile",
-                           body_type=arcade.PymunkPhysicsEngine.STATIC
-                           )

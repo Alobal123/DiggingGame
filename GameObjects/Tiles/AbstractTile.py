@@ -28,4 +28,8 @@ class AbstractTile(Sprite, ABC):
         return False
 
     def add_to_physics(self, physics):
-        physics.add_sprite(self)
+        physics.add_sprite(self,
+                           friction=0.4,
+                           collision_type="tile",
+                           body_type=arcade.PymunkPhysicsEngine.STATIC
+                           )

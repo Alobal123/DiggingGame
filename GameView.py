@@ -82,10 +82,8 @@ class GameView(arcade.View):
 
         self.sign_list.append(right_sign)
         self.sign_list.append(left_sign)
-
-        self.physics_engine.add_sprite_list(self.sign_list,
-                                            collision_type='sign',
-                                            body_type=arcade.PymunkPhysicsEngine.STATIC)
+        left_sign.add_to_physics(self.physics_engine)
+        right_sign.add_to_physics(self.physics_engine)
 
     def setup(self):
         """ Set up the game and initialize the variables. """
@@ -179,9 +177,7 @@ class GameView(arcade.View):
         for tile in tiles:
             building = self.builder.click_build(button, tile)
             if building:
-                self.physics_engine.add_sprite(building,
-                                               collision_type="sign",
-                                               body_type=arcade.PymunkPhysicsEngine.STATIC)
+                building.add_to_physics(self.physics_engine)
                 self.sign_list.append(building)
 
     def on_mouse_drag(self, x: int, y: int, dx: int, dy: int, _buttons: int, _modifiers: int):

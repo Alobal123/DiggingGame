@@ -29,7 +29,7 @@ class Builder:
         self.switch_tile(self.get_building_foundations(tile))
         return building
 
-    def get_building_foundations(self, tile) -> List[BaseTile]:
+    def get_building_foundations(self, tile) -> BaseTile:
         return tile.get_tile_in_direction(0, -1, self.tiles)
 
     def can_be_build(self, tile: BuildingTile) -> bool:

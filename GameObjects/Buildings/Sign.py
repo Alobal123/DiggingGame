@@ -1,5 +1,7 @@
 from abc import ABC
 
+import arcade
+
 from GameObjects.Buildings.AbstractBuilding import AbstractBuilding
 
 
@@ -9,6 +11,11 @@ class Sign(AbstractBuilding, ABC):
 
     def __init__(self, x, y):
         super().__init__(x, y)
+
+    def add_to_physics(self, physics):
+        physics.add_sprite(self,
+                           collision_type="sign",
+                           body_type=arcade.PymunkPhysicsEngine.STATIC)
 
 
 class RightSign(Sign):
