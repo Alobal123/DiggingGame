@@ -185,7 +185,8 @@ class GameView(arcade.View):
             self.drag_counter = 8
             tiles = arcade.get_sprites_at_point(self.get_mouse_coordinates(x, y), self.tile_list)
             for tile in tiles:
-                if tile != self.last_dragged_over:
+                if tile != self.last_dragged_over and \
+                        self.last_dragged_over.selected != tile.selected:
                     tile.on_mouse_press()
                     self.last_dragged_over = tile
         else:
